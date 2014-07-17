@@ -1,0 +1,109 @@
+<%PERL>
+# Oeris::HideWidgets
+my $oeris_hide_widget_dates 		= $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetDates');
+my $oeris_hide_widget_basics 		= $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetBasics');
+my $oeris_hide_widget_people 		= $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetPeople');
+my $oeris_hide_widget_reminders 	= $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetReminders');
+my $oeris_hide_widget_links 		= $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetLinks');
+my $oeris_hide_widget_attachements 	= $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetAttach');
+my $oeris_hide_widget_requestor 	= $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetRequestor');
+</%PERL>
+
+
+<table width="100%" class="ticket-summary">
+<tr>
+  <td valign="top" class="boxcontainer">
+% $m->callback( %ARGS, CallbackName => 'LeftColumnTop' );
+
+%# Oeris::HideWidgets - Basics
+% $RT::Logger->debug("Oeris::HideWidgets - Basics : Current User Has Right ? ".$oeris_hide_widget_basics);
+% if ( !$oeris_hide_widget_basics ) {
+    <&| /Widgets/TitleBox, title => loc('The Basics'),
+        (($can_modify || $can_modify_cf) ? (title_href => RT->Config->Get('WebPath')."/Ticket/Modify.html?id=".$Ticket->Id) : ()),
+        class => 'ticket-info-basics',
+    &><& /Ticket/Elements/ShowBasics, Ticket => $Ticket &></&>
+% }
+
+    <& /Elements/ShowCustomFieldCustomGroupings,
+        Object       => $Ticket,
+        title_href   => ($can_modify || $can_modify_cf) ? RT->Config->Get('WebPath')."/Ticket/Modify.html" : "",
+        &>
+
+%# Oeris::HideWidgets - People
+% $RT::Logger->debug("Oeris::HideWidgets - People : Current User Has Right ? ".$oeris_hide_widget_people);
+% if ( !$oeris_hide_widget_people ) {
+    <&| /Widgets/TitleBox, title => loc('People'),
+        (($can_modify || $can_modify_owner || $can_modify_people) ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyPeople.html?id=".$Ticket->Id) : ()),
+        class => 'ticket-info-people',
+    &><& /Ticket/Elements/ShowPeople, Ticket => $Ticket &></&>
+% }
+
+%# Oeris::HideWidgets - Attachments
+% $RT::Logger->debug("Oeris::HideWidgets - Attachments : Current User Has Right ? ".$oeris_hide_widget_attachements);
+% if ( !$oeris_hide_widget_attachements ) {
+    <& /Ticket/Elements/ShowAttachments, Ticket => $Ticket, Attachments => $Attachments &>
+% }
+% $m->callback( %ARGS, CallbackName => 'AfterAttachments' );
+
+%# Oeris::HideWidgets - Requestor
+% $RT::Logger->debug("Oeris::HideWidgets - Requestor : Current User Has Right ? ".$oeris_hide_widget_requestor);
+% if ( !$oeris_hide_widget_requestor ) {
+    <& /Ticket/Elements/ShowRequestor, Ticket => $Ticket &>
+% }
+% $m->callback( %ARGS, CallbackName => 'LeftColumn' );
+  </td>
+  <td valign="top" class="boxcontainer">
+% $m->callback( %ARGS, CallbackName => 'RightColumnTop' );
+%# Oeris::HideWidgets - Reminders
+% $RT::Logger->debug("Oeris::HideWidgets - Reminders : Current User Has Right ? ".$oeris_hide_widget_reminders);
+% if ( !$oeris_hide_widget_reminders ) {
+% if ( RT->Config->Get('EnableReminders') ) {
+    <&|/Widgets/TitleBox, title => loc("Reminders"),
+        title_href => RT->Config->Get('WebPath')."/Ticket/Reminders.html?id=".$Ticket->Id,
+        class => 'ticket-info-reminders',
+    &>
+        <table><tr><td>
+            <form action="<%RT->Config->Get('WebPath')%>/Ticket/Display.html" name="UpdateReminders" id="UpdateReminders" method="post">
+                <& /Ticket/Elements/Reminders, Ticket => $Ticket, ShowCompleted => 0 &>
+            </form>
+        </td></tr></table>
+    </&>
+% }
+% }
+
+%# Oeris::HideWidgets - Dates
+% $RT::Logger->debug("Oeris::HideWidgets - Dates : Current User Has Right ? ".$oeris_hide_widget_dates);
+% if ( !$oeris_hide_widget_dates ) {
+    <&| /Widgets/TitleBox, title => loc("Dates"),
+        ($can_modify ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyDates.html?id=".$Ticket->Id) : ()),
+        class => 'ticket-info-dates',
+    &><& /Ticket/Elements/ShowDates, Ticket => $Ticket &></&>
+% }
+% my (@extra);
+% push @extra, titleright_raw => '<a href="'. RT->Config->Get('WebPath'). '/Ticket/Graphs/index.html?id='.$Ticket->id.'">'.loc('Graph').'</a>' unless RT->Config->Get('DisableGraphViz');
+% $m->callback( %ARGS, CallbackName => 'LinksExtra', extra => \@extra );
+
+%# Oeris::HideWidgets - Links
+% $RT::Logger->debug("Oeris::HideWidgets - Links : Current User Has Right ? ".$oeris_hide_widget_links);
+% if ( !$oeris_hide_widget_links ) {
+    <&| /Widgets/TitleBox, title => loc('Links'),
+        ($can_modify ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyLinks.html?id=".$Ticket->Id) : ()),
+        class => 'ticket-info-links',
+        @extra,
+    &><& /Elements/ShowLinks, Object => $Ticket &></&>
+% }
+% $m->callback( %ARGS, CallbackName => 'RightColumn' );
+  </td>
+</tr>
+</table>
+<%ARGS>
+$Ticket => undef
+$Attachments => undef
+</%ARGS>
+<%INIT>
+my $can_modify = $Ticket->CurrentUserHasRight('ModifyTicket');
+my $can_modify_cf = $Ticket->CurrentUserHasRight('ModifyCustomField');
+my $can_modify_owner = $Ticket->CurrentUserCanSetOwner();
+my $can_modify_people = $Ticket->CurrentUserHasRight('Watch')
+                     || $Ticket->CurrentUserHasRight('WatchAsAdminCc');
+</%INIT>
