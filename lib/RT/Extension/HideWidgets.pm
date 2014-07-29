@@ -10,11 +10,11 @@ RT::Extension::HideWidgets - Allow admin to hide widgets per user, group and rol
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use RT::System;
 
@@ -22,7 +22,7 @@ use RT::System;
 
 =head1 SYNOPSIS
 
-The HideWidgets RT Extension allow admin to hide widgets per user, group and role.
+The HideWidgets RT Extension allow admins to hide widgets per user, group and role.
 Once installed, new rights will appear in the following administration panels:
 - Administration->Global->Group Rights
 - Administration->Global->Users Rights
@@ -33,14 +33,36 @@ Neil Orley, C<< <neil.orley at oeris.fr> >>
 
 =cut
 
+# Fixed TT : [rt.cpan.org #97596] Unimplemented in RT::Extension::HideWidgets
+RT::System::AddRights(
+    OerisHideWidgetBasics       => "[".__PACKAGE__."] - Hide widget 'Basics'",
+    OerisHideWidgetPeople       => "[".__PACKAGE__."] - Hide widget 'People'",
+    OerisHideWidgetReminders    => "[".__PACKAGE__."] - Hide widget 'Reminders'",
+    OerisHideWidgetDates        => "[".__PACKAGE__."] - Hide widget 'Dates'",
+    OerisHideWidgetLinks        => "[".__PACKAGE__."] - Hide widget 'Links'",
+    OerisHideWidgetAttach       => "[".__PACKAGE__."] - Hide widget 'Attachments'",
+    OerisHideWidgetRequestor    => "[".__PACKAGE__."] - Hide widget 'Requestor'"
+);
 
-'RT::System'->AddRight( General => OerisHideWidgetBasics       => "[".__PACKAGE__."] - Masque le widget 'Elements de base'");
-'RT::System'->AddRight( General => OerisHideWidgetPeople       => "[".__PACKAGE__."] - Masque le widget 'Personnes'");
-'RT::System'->AddRight( General => OerisHideWidgetReminders    => "[".__PACKAGE__."] - Masque le widget 'Rappels'"); 
-'RT::System'->AddRight( General => OerisHideWidgetDates        => "[".__PACKAGE__."] - Masque le widget 'Dates'"); 
-'RT::System'->AddRight( General => OerisHideWidgetLinks        => "[".__PACKAGE__."] - Masque le widget 'Relations'"); 
-'RT::System'->AddRight( General => OerisHideWidgetAttach       => "[".__PACKAGE__."] - Masque le widget 'Pieces jointes'");
-'RT::System'->AddRight( General => OerisHideWidgetRequestor    => "[".__PACKAGE__."] - Masque le widget 'Demandeurs'");
+RT::System::AddRightCategories(
+    OerisHideWidgetBasics       => 'General',
+    OerisHideWidgetPeople       => 'General',
+    OerisHideWidgetReminders    => 'General',
+    OerisHideWidgetDates        => 'General',
+    OerisHideWidgetLinks        => 'General',
+    OerisHideWidgetAttach       => 'General',
+    OerisHideWidgetRequestor    => 'General'
+);
+
+
+# Work only for RT 4.2.5
+#'RT::System'->AddRight( General => OerisHideWidgetBasics       => "[".__PACKAGE__."] - Hide widget 'Basics'");
+#'RT::System'->AddRight( General => OerisHideWidgetPeople       => "[".__PACKAGE__."] - Hide widget 'People'");
+#'RT::System'->AddRight( General => OerisHideWidgetReminders    => "[".__PACKAGE__."] - Hide widget 'Reminders'"); 
+#'RT::System'->AddRight( General => OerisHideWidgetDates        => "[".__PACKAGE__."] - Hide widget 'Dates'"); 
+#'RT::System'->AddRight( General => OerisHideWidgetLinks        => "[".__PACKAGE__."] - Hide widget 'Links'"); 
+#'RT::System'->AddRight( General => OerisHideWidgetAttach       => "[".__PACKAGE__."] - Hide widget 'Attachments'");
+#'RT::System'->AddRight( General => OerisHideWidgetRequestor    => "[".__PACKAGE__."] - Hide widget 'Requestor'");
 
 =head1 INSTALLATION
 
