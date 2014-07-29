@@ -9,12 +9,10 @@ my $oeris_hide_widget_attachements 	= $session{'CurrentUser'}->HasRight(Object =
 my $oeris_hide_widget_requestor 	= $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetRequestor');
 </%PERL>
 
-
 <table width="100%" class="ticket-summary">
 <tr>
   <td valign="top" class="boxcontainer">
 % $m->callback( %ARGS, CallbackName => 'LeftColumnTop' );
-
 %# Oeris::HideWidgets - Basics
 % $RT::Logger->debug("Oeris::HideWidgets - Basics : Current User Has Right ? ".$oeris_hide_widget_basics);
 % if ( !$oeris_hide_widget_basics ) {
@@ -23,28 +21,24 @@ my $oeris_hide_widget_requestor 	= $session{'CurrentUser'}->HasRight(Object => $
         class => 'ticket-info-basics',
     &><& /Ticket/Elements/ShowBasics, Ticket => $Ticket &></&>
 % }
-
-    <& /Elements/ShowCustomFieldCustomGroupings,
-        Object       => $Ticket,
-        title_href   => ($can_modify || $can_modify_cf) ? RT->Config->Get('WebPath')."/Ticket/Modify.html" : "",
-        &>
-
+    <&| /Widgets/TitleBox, title => loc('Custom Fields'),
+        (($can_modify || $can_modify_cf) ? (title_href => RT->Config->Get('WebPath')."/Ticket/Modify.html?id=".$Ticket->Id) : ()),
+        class => 'ticket-info-cfs',
+        hide_empty => 1,
+    &><& /Ticket/Elements/ShowCustomFields, Ticket => $Ticket &></&>
 %# Oeris::HideWidgets - People
 % $RT::Logger->debug("Oeris::HideWidgets - People : Current User Has Right ? ".$oeris_hide_widget_people);
 % if ( !$oeris_hide_widget_people ) {
     <&| /Widgets/TitleBox, title => loc('People'),
-        (($can_modify || $can_modify_owner || $can_modify_people) ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyPeople.html?id=".$Ticket->Id) : ()),
+        (($can_modify || $can_modify_owner) ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyPeople.html?id=".$Ticket->Id) : ()),
         class => 'ticket-info-people',
     &><& /Ticket/Elements/ShowPeople, Ticket => $Ticket &></&>
 % }
-
 %# Oeris::HideWidgets - Attachments
 % $RT::Logger->debug("Oeris::HideWidgets - Attachments : Current User Has Right ? ".$oeris_hide_widget_attachements);
 % if ( !$oeris_hide_widget_attachements ) {
     <& /Ticket/Elements/ShowAttachments, Ticket => $Ticket, Attachments => $Attachments &>
 % }
-% $m->callback( %ARGS, CallbackName => 'AfterAttachments' );
-
 %# Oeris::HideWidgets - Requestor
 % $RT::Logger->debug("Oeris::HideWidgets - Requestor : Current User Has Right ? ".$oeris_hide_widget_requestor);
 % if ( !$oeris_hide_widget_requestor ) {
@@ -65,12 +59,12 @@ my $oeris_hide_widget_requestor 	= $session{'CurrentUser'}->HasRight(Object => $
         <table><tr><td>
             <form action="<%RT->Config->Get('WebPath')%>/Ticket/Display.html" name="UpdateReminders" id="UpdateReminders" method="post">
                 <& /Ticket/Elements/Reminders, Ticket => $Ticket, ShowCompleted => 0 &>
+                <div align="right"><input type="submit" class="button" value="<&|/l&>Save</&>" /></div>
             </form>
         </td></tr></table>
     </&>
 % }
 % }
-
 %# Oeris::HideWidgets - Dates
 % $RT::Logger->debug("Oeris::HideWidgets - Dates : Current User Has Right ? ".$oeris_hide_widget_dates);
 % if ( !$oeris_hide_widget_dates ) {
@@ -82,7 +76,6 @@ my $oeris_hide_widget_requestor 	= $session{'CurrentUser'}->HasRight(Object => $
 % my (@extra);
 % push @extra, titleright_raw => '<a href="'. RT->Config->Get('WebPath'). '/Ticket/Graphs/index.html?id='.$Ticket->id.'">'.loc('Graph').'</a>' unless RT->Config->Get('DisableGraphViz');
 % $m->callback( %ARGS, CallbackName => 'LinksExtra', extra => \@extra );
-
 %# Oeris::HideWidgets - Links
 % $RT::Logger->debug("Oeris::HideWidgets - Links : Current User Has Right ? ".$oeris_hide_widget_links);
 % if ( !$oeris_hide_widget_links ) {
@@ -90,7 +83,7 @@ my $oeris_hide_widget_requestor 	= $session{'CurrentUser'}->HasRight(Object => $
         ($can_modify ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyLinks.html?id=".$Ticket->Id) : ()),
         class => 'ticket-info-links',
         @extra,
-    &><& /Elements/ShowLinks, Object => $Ticket &></&>
+    &><& /Elements/ShowLinks, Ticket => $Ticket &></&>
 % }
 % $m->callback( %ARGS, CallbackName => 'RightColumn' );
   </td>
@@ -103,7 +96,7 @@ $Attachments => undef
 <%INIT>
 my $can_modify = $Ticket->CurrentUserHasRight('ModifyTicket');
 my $can_modify_cf = $Ticket->CurrentUserHasRight('ModifyCustomField');
-my $can_modify_owner = $Ticket->CurrentUserCanSetOwner();
-my $can_modify_people = $Ticket->CurrentUserHasRight('Watch')
-                     || $Ticket->CurrentUserHasRight('WatchAsAdminCc');
+my $can_modify_owner = $Ticket->CurrentUserHasRight('OwnTicket')
+                    || $Ticket->CurrentUserHasRight('TakeTicket')
+                    || $Ticket->CurrentUserHasRight('StealTicket');
 </%INIT>
