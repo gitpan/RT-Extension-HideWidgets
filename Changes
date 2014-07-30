@@ -1,7 +1,9 @@
 Revision history for RT-Extension-HideWidgets
 
 0.02	29/07/2014
-	Fixed TT : https://rt.cpan.org/Public/Bug/Display.html?id=97596
+	0.025 - Improvement : HideWigets for SelfService an Privileged users
+	0.024 - Bug Fix : https://rt.cpan.org/Public/Bug/Display.html?id=97596
+	0.02  - This version works on RT 4.0.x
 
 0.01    07/2014
         First version, released.

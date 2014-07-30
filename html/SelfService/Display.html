@@ -1,9 +1,3 @@
-<%PERL>
-# Oeris::HideWidgets
-my $oeris_hide_widget_dates 		    = $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetDates');
-my $oeris_hide_widget_basics 		    = $session{'CurrentUser'}->HasRight(Object => $Ticket, Right => 'OerisHideWidgetBasics');
-</%PERL>
-
 <& /SelfService/Elements/Header, Title => loc('#[_1]: [_2]', $Ticket->id, $Ticket->Subject) &>
 
 % $m->callback(CallbackName => 'BeforeActionList', %ARGS, Actions => \@results, ARGSRef => \%ARGS, Ticket => $Ticket );
@@ -12,10 +6,20 @@ my $oeris_hide_widget_basics 		    = $session{'CurrentUser'}->HasRight(Object =>
 
 <table width="100%" class="ticketsummary" >
       <tr>
+        <td valign="top" width="50%" class="boxcontainer">
 %# Oeris::HideWidgets - Basics
-% $RT::Logger->debug("Oeris::HideWidgets - Basics : Current User Has Right ? ".$oeris_hide_widget_basics);
-% if ( !$oeris_hide_widget_basics ) {      
-        <td valign="top" width="50%" class="boxcontainer">   
+% my $OerisHideWidgetBasics = 0;
+% $OerisHideWidgetBasics = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetBasics');
+% my $groups = RT::Groups->new($session{'CurrentUser'});
+% $groups->LimitToUserDefinedGroups;
+% $groups->ForWhichCurrentUserHasRight(
+%     Right             => 'OerisHideWidgetBasics',
+%     IncludeSuperusers => 0,
+% );
+% $OerisHideWidgetBasics = 1 if $groups->Count;
+
+% $RT::Logger->debug("Oeris::HideWidgets - Basics : Current User Has Right ? ".$OerisHideWidgetBasics);
+% if ( !$OerisHideWidgetBasics ) {      
           <&| /Widgets/TitleBox, title => loc('The Basics'),
                 ($LinkBasicsTitle ? (title_href => $title_box_link) : ()),
                 title_class=> 'inverse',
@@ -23,19 +27,33 @@ my $oeris_hide_widget_basics 		    = $session{'CurrentUser'}->HasRight(Object =>
                 <& /Ticket/Elements/ShowBasics, Ticket => $Ticket &>
                 <& /Ticket/Elements/ShowCustomFields, Ticket => $Ticket &>
           </&>
-        </td>
+% } else {
+	&nbsp;
 % }
-%# Oeris::HideWidgets - Dates
-% $RT::Logger->debug("Oeris::HideWidgets - Dates : Current User Has Right ? ".$oeris_hide_widget_dates);
-% if ( !$oeris_hide_widget_dates ) {        
+        </td>
         <td valign="top" width="50%" class="boxcontainer">
+%# Oeris::HideWidgets - Dates
+% my $OerisHideWidgetDates = 0;
+% $OerisHideWidgetDates = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetDates');
+% $groups = RT::Groups->new($session{'CurrentUser'});
+% $groups->LimitToUserDefinedGroups;
+% $groups->ForWhichCurrentUserHasRight(
+%     Right             => 'OerisHideWidgetDates',
+%     IncludeSuperusers => 0,
+% );
+% $OerisHideWidgetDates = 1 if $groups->Count;
+
+% $RT::Logger->debug("Oeris::HideWidgets - Dates : Current User Has Right ? ".$OerisHideWidgetDates);
+% if ( !$OerisHideWidgetDates ) {        
           <&| /Widgets/TitleBox, title => loc("Dates"),
                 title_class=> 'inverse',
                  color => "#663366" &>
           <& /Ticket/Elements/ShowDates, Ticket => $Ticket, UpdatedLink => 0 &>
           </&>
-        </td>
+% } else {
+	&nbsp;
 % }        
+        </td>
       </tr>
 </table>
 
