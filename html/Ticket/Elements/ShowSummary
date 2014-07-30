@@ -2,6 +2,7 @@
 <tr>
   <td valign="top" class="boxcontainer">
 % $m->callback( %ARGS, CallbackName => 'LeftColumnTop' );
+
 %# Oeris::HideWidgets - Basics
 % my $OerisHideWidgetBasics = 0;
 % $OerisHideWidgetBasics = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetBasics');
@@ -20,11 +21,12 @@
         class => 'ticket-info-basics',
     &><& /Ticket/Elements/ShowBasics, Ticket => $Ticket &></&>
 % }
-    <&| /Widgets/TitleBox, title => loc('Custom Fields'),
-        (($can_modify || $can_modify_cf) ? (title_href => RT->Config->Get('WebPath')."/Ticket/Modify.html?id=".$Ticket->Id) : ()),
-        class => 'ticket-info-cfs',
-        hide_empty => 1,
-    &><& /Ticket/Elements/ShowCustomFields, Ticket => $Ticket &></&>
+
+    <& /Elements/ShowCustomFieldCustomGroupings,
+        Object       => $Ticket,
+        title_href   => ($can_modify || $can_modify_cf) ? RT->Config->Get('WebPath')."/Ticket/Modify.html" : "",
+        &>
+
 %# Oeris::HideWidgets - People
 % my $OerisHideWidgetPeople = 0;
 % $OerisHideWidgetPeople = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetPeople');
@@ -39,10 +41,11 @@
 % $RT::Logger->debug("Oeris::HideWidgets - People : Current User Has Right ? ".$OerisHideWidgetPeople);
 % if ( !$OerisHideWidgetPeople ) {
     <&| /Widgets/TitleBox, title => loc('People'),
-        (($can_modify || $can_modify_owner) ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyPeople.html?id=".$Ticket->Id) : ()),
+        (($can_modify || $can_modify_owner || $can_modify_people) ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyPeople.html?id=".$Ticket->Id) : ()),
         class => 'ticket-info-people',
     &><& /Ticket/Elements/ShowPeople, Ticket => $Ticket &></&>
 % }
+
 %# Oeris::HideWidgets - Attachments
 % my $OerisHideWidgetAttach = 0;
 % $OerisHideWidgetAttach = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetAttach');
@@ -58,6 +61,8 @@
 % if ( !$OerisHideWidgetAttach ) {
     <& /Ticket/Elements/ShowAttachments, Ticket => $Ticket, Attachments => $Attachments &>
 % }
+% $m->callback( %ARGS, CallbackName => 'AfterAttachments' );
+
 %# Oeris::HideWidgets - Requestor
 % my $OerisHideWidgetRequestor = 0;
 % $OerisHideWidgetRequestor = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetRequestor');
@@ -98,12 +103,12 @@
         <table><tr><td>
             <form action="<%RT->Config->Get('WebPath')%>/Ticket/Display.html" name="UpdateReminders" id="UpdateReminders" method="post">
                 <& /Ticket/Elements/Reminders, Ticket => $Ticket, ShowCompleted => 0 &>
-                <div align="right"><input type="submit" class="button" value="<&|/l&>Save</&>" /></div>
             </form>
         </td></tr></table>
     </&>
 % }
 % }
+
 %# Oeris::HideWidgets - Dates
 % my $OerisHideWidgetDates = 0;
 % $OerisHideWidgetDates = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetDates');
@@ -125,6 +130,7 @@
 % my (@extra);
 % push @extra, titleright_raw => '<a href="'. RT->Config->Get('WebPath'). '/Ticket/Graphs/index.html?id='.$Ticket->id.'">'.loc('Graph').'</a>' unless RT->Config->Get('DisableGraphViz');
 % $m->callback( %ARGS, CallbackName => 'LinksExtra', extra => \@extra );
+
 %# Oeris::HideWidgets - Links
 % my $OerisHideWidgetLinks = 0;
 % $OerisHideWidgetLinks = 1 if $session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'OerisHideWidgetLinks');
@@ -142,7 +148,7 @@
         ($can_modify ? (title_href => RT->Config->Get('WebPath')."/Ticket/ModifyLinks.html?id=".$Ticket->Id) : ()),
         class => 'ticket-info-links',
         @extra,
-    &><& /Elements/ShowLinks, Ticket => $Ticket &></&>
+    &><& /Elements/ShowLinks, Object => $Ticket &></&>
 % }
 % $m->callback( %ARGS, CallbackName => 'RightColumn' );
   </td>
@@ -155,7 +161,7 @@ $Attachments => undef
 <%INIT>
 my $can_modify = $Ticket->CurrentUserHasRight('ModifyTicket');
 my $can_modify_cf = $Ticket->CurrentUserHasRight('ModifyCustomField');
-my $can_modify_owner = $Ticket->CurrentUserHasRight('OwnTicket')
-                    || $Ticket->CurrentUserHasRight('TakeTicket')
-                    || $Ticket->CurrentUserHasRight('StealTicket');
+my $can_modify_owner = $Ticket->CurrentUserCanSetOwner();
+my $can_modify_people = $Ticket->CurrentUserHasRight('Watch')
+                     || $Ticket->CurrentUserHasRight('WatchAsAdminCc');
 </%INIT>

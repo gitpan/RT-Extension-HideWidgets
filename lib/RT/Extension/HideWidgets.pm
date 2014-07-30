@@ -10,11 +10,11 @@ RT::Extension::HideWidgets - Allow admin to hide widgets per user, group and rol
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use RT::System;
 
@@ -34,35 +34,35 @@ Neil Orley, C<< <neil.orley at oeris.fr> >>
 =cut
 
 # Fixed TT : [rt.cpan.org #97596] Unimplemented in RT::Extension::HideWidgets
-RT::System::AddRights(
-    OerisHideWidgetBasics       => "[".__PACKAGE__."] - Hide widget 'Basics' for 'Privileged' and 'SelfService' users",
-    OerisHideWidgetPeople       => "[".__PACKAGE__."] - Hide widget 'People' for 'Privileged' users",
-    OerisHideWidgetReminders    => "[".__PACKAGE__."] - Hide widget 'Reminders' for 'Privileged' users",
-    OerisHideWidgetDates        => "[".__PACKAGE__."] - Hide widget 'Dates' for 'Privileged' and 'SelfService' users",
-    OerisHideWidgetLinks        => "[".__PACKAGE__."] - Hide widget 'Links' for 'Privileged' users",
-    OerisHideWidgetAttach       => "[".__PACKAGE__."] - Hide widget 'Attachments' for 'Privileged' users",
-    OerisHideWidgetRequestor    => "[".__PACKAGE__."] - Hide widget 'Requestor' for 'Privileged' users"
-);
+#RT::System::AddRights(
+#    OerisHideWidgetBasics       => "[".__PACKAGE__."] - Hide widget 'Basics' for 'Privileged' and 'SelfService' users",
+#    OerisHideWidgetPeople       => "[".__PACKAGE__."] - Hide widget 'People' for 'Privileged' users",
+#    OerisHideWidgetReminders    => "[".__PACKAGE__."] - Hide widget 'Reminders' for 'Privileged' users",
+#    OerisHideWidgetDates        => "[".__PACKAGE__."] - Hide widget 'Dates' for 'Privileged' and 'SelfService' users",
+#    OerisHideWidgetLinks        => "[".__PACKAGE__."] - Hide widget 'Links' for 'Privileged' users",
+#    OerisHideWidgetAttach       => "[".__PACKAGE__."] - Hide widget 'Attachments' for 'Privileged' users",
+#    OerisHideWidgetRequestor    => "[".__PACKAGE__."] - Hide widget 'Requestor' for 'Privileged' users"
+#);
 
-RT::System::AddRightCategories(
-    OerisHideWidgetBasics       => 'General',
-    OerisHideWidgetPeople       => 'General',
-    OerisHideWidgetReminders    => 'General',
-    OerisHideWidgetDates        => 'General',
-    OerisHideWidgetLinks        => 'General',
-    OerisHideWidgetAttach       => 'General',
-    OerisHideWidgetRequestor    => 'General'
-);
+#RT::System::AddRightCategories(
+#    OerisHideWidgetBasics       => 'General',
+#    OerisHideWidgetPeople       => 'General',
+#    OerisHideWidgetReminders    => 'General',
+#    OerisHideWidgetDates        => 'General',
+#    OerisHideWidgetLinks        => 'General',
+#    OerisHideWidgetAttach       => 'General',
+#    OerisHideWidgetRequestor    => 'General'
+#);
 
 
 # Work only for RT 4.2.5
-#'RT::System'->AddRight( General => OerisHideWidgetBasics       => "[".__PACKAGE__."] - Hide widget 'Basics' for 'Privileged' and 'SelfService' users");
-#'RT::System'->AddRight( General => OerisHideWidgetPeople       => "[".__PACKAGE__."] - Hide widget 'People' for 'Privileged' users");
-#'RT::System'->AddRight( General => OerisHideWidgetReminders    => "[".__PACKAGE__."] - Hide widget 'Reminders' for 'Privileged' users"); 
-#'RT::System'->AddRight( General => OerisHideWidgetDates        => "[".__PACKAGE__."] - Hide widget 'Dates' for 'Privileged' and 'SelfService' users"); 
-#'RT::System'->AddRight( General => OerisHideWidgetLinks        => "[".__PACKAGE__."] - Hide widget 'Links' for 'Privileged' users"); 
-#'RT::System'->AddRight( General => OerisHideWidgetAttach       => "[".__PACKAGE__."] - Hide widget 'Attachments' for 'Privileged' users");
-#'RT::System'->AddRight( General => OerisHideWidgetRequestor    => "[".__PACKAGE__."] - Hide widget 'Requestor' for 'Privileged' users");
+'RT::System'->AddRight( General => OerisHideWidgetBasics       => "[".__PACKAGE__."] - Hide widget 'Basics' for 'Privileged' and 'SelfService' users");
+'RT::System'->AddRight( General => OerisHideWidgetDates        => "[".__PACKAGE__."] - Hide widget 'Dates' for 'Privileged' and 'SelfService' users"); 
+'RT::System'->AddRight( General => OerisHideWidgetPeople       => "[".__PACKAGE__."] - Hide widget 'People' for 'Privileged' users");
+'RT::System'->AddRight( General => OerisHideWidgetReminders    => "[".__PACKAGE__."] - Hide widget 'Reminders' for 'Privileged' users"); 
+'RT::System'->AddRight( General => OerisHideWidgetLinks        => "[".__PACKAGE__."] - Hide widget 'Links' for 'Privileged' users"); 
+'RT::System'->AddRight( General => OerisHideWidgetAttach       => "[".__PACKAGE__."] - Hide widget 'Attachments' for 'Privileged' users");
+'RT::System'->AddRight( General => OerisHideWidgetRequestor    => "[".__PACKAGE__."] - Hide widget 'Requestor' for 'Privileged' users");
 
 =head1 INSTALLATION
 
